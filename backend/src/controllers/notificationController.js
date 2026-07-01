@@ -1,3 +1,4 @@
+const pool = require('../config/db');
 const getNotifications = async (req, res) => {
     const userId = req.user.id;
     try {
@@ -5,6 +6,7 @@ const getNotifications = async (req, res) => {
             `SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC`,
             [userId]
         );
+        console.log("Logged in user:", req.user.id);
    res.status(200).json({
     notifications: result.rows
 });

@@ -1,3 +1,5 @@
+const pool = require('../config/db');
+const { getIO } = require("../sockets/socket");
 const createTask = async (req, res) => {
   try{
     const { title, description, project_id, assigned_to,priority,due_date } = req.body;
@@ -55,10 +57,25 @@ if (developer.rows.length === 0) {
         `INSERT INTO notifications (user_id, message) VALUES ($1, $2)`,
         [assigned_to, notificationMessage]
     );
+    const io = getIO();
+
+io.to(`user_${assigned_to}`).emit(
+    "new_notification",
+    {
+        message: notificationMessage
+    }
+);
   } catch (error) {
     console.error('Error creating task:', error);
     res.status(500).json({ error: 'Failed to create task' });
   }
+ /*catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+        error: error.message
+    });
+}*/
 }
 
 const getTasks=async (req, res) => {
@@ -99,6 +116,12 @@ catch (error) {
     console.error('Error fetching tasks:', error);
     res.status(500).json({ error: 'Failed to fetch tasks' });
 }
+/*catch (error) {
+    console.error(error);
+    res.status(500).json({
+        error: error.message
+    });
+}*/
  
 }
 
